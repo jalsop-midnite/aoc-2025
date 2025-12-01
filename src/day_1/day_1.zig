@@ -1,4 +1,5 @@
 const std = @import("std");
+const aoc_2025 = @import("aoc_2025");
 
 const DIAL_SIZE = 100;
 
@@ -18,17 +19,16 @@ pub fn main(args: *std.process.ArgIterator) !void {
     };
     defer file.close();
 
-    std.debug.print("Reading from file\n", .{});
-    var buffer: [1_000_000]u8 = undefined;
+    var buffer: [1024]u8 = undefined;
     var file_reader = file.reader(&buffer);
     const reader = &file_reader.interface;
-    std.debug.print("Got reader\n", .{});
+
+    var lines = aoc_2025.LinesIterator{ .reader = reader };
 
     var zeroes: i64 = 0;
     var current_rotation: i64 = 50;
 
-    while (reader.takeDelimiterExclusive('\n')) |line| {
-        // const line_content = line[0 .. line.len - 1]; // remove newline
+    while (try lines.next()) |line| {
         std.debug.print("Current Position: {d}, Rotation: {s}\n", .{ current_rotation, line });
 
         const rotation = try getValueFromLine(line);
@@ -40,21 +40,7 @@ pub fn main(args: *std.process.ArgIterator) !void {
         }
 
         current_rotation = applyRotation(current_rotation, rotation);
-        // Skip the newline
-        _ = reader.take(1) catch |err| {
-            switch (err) {
-                error.EndOfStream => {},
-                else => return err,
-            }
-        };
-    } else |err| {
-        switch (err) {
-            error.EndOfStream => {},
-            else => return err,
-        }
     }
-
-    std.debug.print("Reached end of file\n", .{});
 
     std.debug.print("Total zeroes hit: {d}\n", .{zeroes});
 }

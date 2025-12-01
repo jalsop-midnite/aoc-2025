@@ -1,5 +1,7 @@
 const std = @import("std");
-const aoc_2025 = @import("aoc_2025");
+
+pub const day_1 = @import("day_1/day_1.zig");
+pub const day_2 = @import("day_2/day_2.zig");
 
 const AocDay = enum {
     Day1,
@@ -33,7 +35,7 @@ pub fn main() !void {
         return;
     };
     switch (day) {
-        AocDay.Day1 => try aoc_2025.day_1.main(&args_iter),
-        AocDay.Day2 => try aoc_2025.day_2.main(),
+        AocDay.Day1 => try day_1.main(&args_iter),
+        AocDay.Day2 => try day_2.main(),
     }
 }

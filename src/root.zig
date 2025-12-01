@@ -1,7 +1,19 @@
-//! By convention, root.zig is the root source file when making a library.
 const std = @import("std");
 
-pub const day_1 = @import("day_1/day_1.zig");
-pub const day_2 = @import("day_2/day_2.zig");
+pub const LinesIterator = struct {
+    reader: *std.io.Reader,
 
-pub const COMMON_MSG = "This is common code";
+    pub fn next(self: *LinesIterator) !?[]const u8 {
+        const line = self.reader.takeDelimiterExclusive('\n') catch |err| {
+            switch (err) {
+                error.EndOfStream => return null,
+                else => return err,
+            }
+        };
+
+        // Skip the newline
+        _ = self.reader.toss(1);
+
+        return line;
+    }
+};
