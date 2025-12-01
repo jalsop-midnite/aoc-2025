@@ -33,7 +33,7 @@ pub fn main() !void {
         return;
     };
     switch (day) {
-        AocDay.Day1 => try aoc_2025.day_1.main(),
+        AocDay.Day1 => try aoc_2025.day_1.main(&args_iter),
         AocDay.Day2 => try aoc_2025.day_2.main(),
     }
 }
