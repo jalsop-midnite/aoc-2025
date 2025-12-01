@@ -77,23 +77,22 @@ fn countZeroes(current: i64, rotation: i64) i64 {
 }
 
 test "countZeroes positive rotations" {
-    try std.testing.expect(countZeroes(50, 60) == 1);
-    try std.testing.expect(countZeroes(90, 10) == 1);
-    try std.testing.expect(countZeroes(40, 20) == 0);
-    try std.testing.expect(countZeroes(50, 1000) == 10);
+    try std.testing.expectEqual(1, countZeroes(50, 60));
+    try std.testing.expectEqual(1, countZeroes(90, 10));
+    try std.testing.expectEqual(0, countZeroes(40, 20));
+    try std.testing.expectEqual(10, countZeroes(50, 1000));
 
     try std.testing.expectEqual(1, countZeroes(0, 100));
     try std.testing.expectEqual(0, countZeroes(0, 50));
 }
 
 test "countZeroes negative rotations" {
-    try std.testing.expect(countZeroes(90, -5) == 0);
+    try std.testing.expectEqual(0, countZeroes(90, -5));
 
-    try std.testing.expect(countZeroes(10, -20) == 1);
-    try std.testing.expect(countZeroes(10, -10) == 1);
-    try std.testing.expect(countZeroes(10, -110) == 2);
-
-    try std.testing.expect(countZeroes(50, -1000) == 10);
+    try std.testing.expectEqual(1, countZeroes(10, -20));
+    try std.testing.expectEqual(1, countZeroes(10, -10));
+    try std.testing.expectEqual(2, countZeroes(10, -110));
+    try std.testing.expectEqual(10, countZeroes(50, -1000));
 
     try std.testing.expectEqual(1, countZeroes(0, -100));
     try std.testing.expectEqual(0, countZeroes(0, -50));
