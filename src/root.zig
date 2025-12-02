@@ -22,3 +22,11 @@ pub const LinesIterator = struct {
         return line;
     }
 };
+
+pub fn output(comptime fmt: []const u8, args: anytype) !void {
+    var buf: [1024]u8 = undefined;
+    var stdout_writer = std.fs.File.stdout().writer(&buf);
+    const writer = &stdout_writer.interface;
+    try writer.print(fmt, args);
+    try writer.flush();
+}

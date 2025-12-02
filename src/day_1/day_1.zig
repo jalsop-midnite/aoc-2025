@@ -43,6 +43,8 @@ pub fn main(args: *std.process.ArgIterator) !void {
     }
 
     std.debug.print("Total zeroes hit: {d}\n", .{zeroes});
+
+    try aoc_2025.output("{d}\n", .{zeroes});
 }
 
 fn getValueFromLine(line: []const u8) !i64 {

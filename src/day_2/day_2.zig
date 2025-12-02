@@ -45,7 +45,7 @@ pub fn main(args: *std.process.ArgIterator) !void {
         }
     }
 
-    std.debug.print("Total of invalid IDs: {d}\n", .{total});
+    try aoc_2025.output("{d}\n", .{total});
 }
 
 const IdRange = struct {
