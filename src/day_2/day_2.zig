@@ -69,12 +69,33 @@ fn isInvalidId(id: u64) !bool {
 
     const id_str = try std.fmt.bufPrint(&buf, "{d}", .{id});
 
-    if (id_str.len % 2 != 0) {
+    for (1..id_str.len) |i| {
+        const sub_sequence = id_str[0..i];
+
+        if (isRepeatedSequence(id_str, sub_sequence)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+fn isRepeatedSequence(candidate: []const u8, sub_sequence: []const u8) bool {
+    if (candidate.len % sub_sequence.len != 0) {
         return false;
     }
 
-    const first_half = id_str[0..(id_str.len / 2)];
-    const second_half = id_str[(id_str.len / 2)..];
+    const repetitions = candidate.len / sub_sequence.len;
 
-    return std.mem.eql(u8, first_half, second_half);
+    for (0..repetitions) |i| {
+        const start = i * sub_sequence.len;
+
+        const segment = candidate[start..][0..sub_sequence.len];
+
+        if (!std.mem.eql(u8, segment, sub_sequence)) {
+            return false;
+        }
+    }
+
+    return true;
 }
