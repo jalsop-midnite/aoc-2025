@@ -36,6 +36,6 @@ pub fn main() !void {
     };
     switch (day) {
         AocDay.Day1 => try day_1.main(&args_iter),
-        AocDay.Day2 => try day_2.main(),
+        AocDay.Day2 => try day_2.main(&args_iter),
     }
 }

@@ -23,7 +23,7 @@ pub fn main(args: *std.process.ArgIterator) !void {
     var file_reader = file.reader(&buffer);
     const reader = &file_reader.interface;
 
-    var lines = aoc_2025.LinesIterator{ .reader = reader };
+    var lines = aoc_2025.LinesIterator{ .delimiter = '\n', .reader = reader };
 
     var zeroes: i64 = 0;
     var current_rotation: i64 = 50;
