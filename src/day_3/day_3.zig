@@ -61,6 +61,38 @@ fn getLargestJoltage(joltages: []const u64, num_digits: u64) u64 {
     var total_joltage: u64 = 0;
     var window_start: u64 = 0;
 
+    // e.g. 12 digits from a 15 digit line
+    // Know first digit must be from the first 4 as othewise there
+    // won't be enough space to fill all 12 digits
+    // 234234234234278
+    // ^^^^
+    // First joltage digit is largest in this window which is 4
+    // 234234234234278
+    // --*                  total_joltage = 4
+
+    // Next window starts after the previous joltage digit which leaves
+    // 15 - 3 = 12 digits left to look at
+    // Of these 12, we know that the next digit must be in the next
+    // 2 as we only need 11 more digits => window_size = 2
+    // 234234234234278
+    // --*^^
+    // Pick the largest in this window, which is 3
+    // 234234234234278
+    // --*-*                total_joltage = 43
+
+    // Continue this way until the number of possible digits is equal to
+    // the number of remaining digits to fill
+    // 234234234234278
+    // --*-*^
+    // 234234234234278
+    // --*-**               total_joltage = 434
+
+    // At this points there are only 9 digits on the right and 9 left to fill
+    // which would lead to a window size of 0
+    // We can now take all remaining digits in order
+    // 234234234234278
+    // --*-***********      total_joltage = 434234234278
+
     for (0..num_digits) |i| {
         const remaining = num_digits - i;
 
@@ -69,15 +101,16 @@ fn getLargestJoltage(joltages: []const u64, num_digits: u64) u64 {
         if (window_size > 0) {
             const window = joltages[window_start..][0..window_size];
 
-            const largest = std.mem.max(u64, window);
+            const digit = std.mem.max(u64, window);
             const largest_idx = std.mem.indexOfMax(u64, window);
-
-            total_joltage += std.math.pow(u64, 10, remaining - 1) * largest;
             window_start += largest_idx + 1;
+
+            total_joltage += std.math.pow(u64, 10, remaining - 1) * digit;
         } else {
             const digit = joltages[window_start];
-            total_joltage += std.math.pow(u64, 10, remaining - 1) * digit;
             window_start += 1;
+
+            total_joltage += std.math.pow(u64, 10, remaining - 1) * digit;
         }
     }
 
