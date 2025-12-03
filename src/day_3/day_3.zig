@@ -40,51 +40,61 @@ pub fn main(args: *std.process.ArgIterator) !void {
         const joltages = try parseJoltages(allocator, stripped_line);
         defer allocator.free(joltages);
 
-        const joltage = getLargestJoltage(joltages);
+        const joltage = getLargestJoltage(joltages, 12);
         total += joltage;
     }
 
     try aoc_2025.output("{d}\n", .{total});
 }
 
-fn parseJoltages(allocator: std.mem.Allocator, line: []const u8) ![]u32 {
-    const joltages = try allocator.alloc(u32, line.len);
+fn parseJoltages(allocator: std.mem.Allocator, line: []const u8) ![]u64 {
+    const joltages = try allocator.alloc(u64, line.len);
 
     for (0..line.len) |i| {
-        joltages[i] = try std.fmt.parseInt(u32, line[i .. i + 1], 10);
+        joltages[i] = try std.fmt.parseInt(u64, line[i .. i + 1], 10);
     }
 
     return joltages;
 }
 
-fn getLargestJoltage(joltages: []const u32) u32 {
-    const largest = std.mem.max(u32, joltages);
-    const largest_idx = std.mem.indexOfMax(u32, joltages);
+fn getLargestJoltage(joltages: []const u64, num_digits: u64) u64 {
+    var total_joltage: u64 = 0;
+    var window_start: u64 = 0;
 
-    if (largest_idx == joltages.len - 1) {
-        const left = std.mem.max(u32, joltages[0 .. joltages.len - 1]);
-        const right = largest;
+    for (0..num_digits) |i| {
+        const remaining = num_digits - i;
 
-        return 10 * left + right;
+        const window_size = joltages.len - window_start - remaining + 1;
+
+        if (window_size > 0) {
+            const window = joltages[window_start..][0..window_size];
+
+            const largest = std.mem.max(u64, window);
+            const largest_idx = std.mem.indexOfMax(u64, window);
+
+            total_joltage += std.math.pow(u64, 10, remaining - 1) * largest;
+            window_start += largest_idx + 1;
+        } else {
+            const digit = joltages[window_start];
+            total_joltage += std.math.pow(u64, 10, remaining - 1) * digit;
+            window_start += 1;
+        }
     }
 
-    const left = largest;
-    const right = std.mem.max(u32, joltages[largest_idx + 1 ..]);
-
-    return 10 * left + right;
+    return total_joltage;
 }
 
-test "largest possible joltage pair" {
+test "largest possible joltage 2 digits" {
     const allocator = std.testing.allocator;
 
     const Case = struct {
         line: []const u8,
-        expected_joltage: u32,
+        expected_joltage: u64,
     };
 
     const cases: [4]Case = .{
-        .{ .line = "987654321111111", .expected_joltage = 98 },
         .{ .line = "811111111111119", .expected_joltage = 89 },
+        .{ .line = "987654321111111", .expected_joltage = 98 },
         .{ .line = "234234234234278", .expected_joltage = 78 },
         .{ .line = "818181911112111", .expected_joltage = 92 },
     };
@@ -93,6 +103,29 @@ test "largest possible joltage pair" {
         const joltages = try parseJoltages(allocator, case.line);
         defer allocator.free(joltages);
 
-        try std.testing.expectEqual(case.expected_joltage, getLargestJoltage(joltages));
+        try std.testing.expectEqual(case.expected_joltage, getLargestJoltage(joltages, 2));
+    }
+}
+
+test "largest possible joltage 12 digits" {
+    const allocator = std.testing.allocator;
+
+    const Case = struct {
+        line: []const u8,
+        expected_joltage: u64,
+    };
+
+    const cases: [4]Case = .{
+        .{ .line = "987654321111111", .expected_joltage = 987654321111 },
+        .{ .line = "811111111111119", .expected_joltage = 811111111119 },
+        .{ .line = "234234234234278", .expected_joltage = 434234234278 },
+        .{ .line = "818181911112111", .expected_joltage = 888911112111 },
+    };
+
+    for (cases) |case| {
+        const joltages = try parseJoltages(allocator, case.line);
+        defer allocator.free(joltages);
+
+        try std.testing.expectEqual(case.expected_joltage, getLargestJoltage(joltages, 12));
     }
 }
