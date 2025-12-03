@@ -1,4 +1,4 @@
-# AOC 2025
+# AOC 2025
 
 To run a particular day's challenge use `zig build run -- day_x`
 
