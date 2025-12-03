@@ -1,16 +1,19 @@
 const std = @import("std");
 
-pub const day_1 = @import("day_1/day_1.zig");
-pub const day_2 = @import("day_2/day_2.zig");
+const day_1 = @import("day_1/day_1.zig");
+const day_2 = @import("day_2/day_2.zig");
+const day_3 = @import("day_3/day_3.zig");
 
 const AocDay = enum {
     Day1,
     Day2,
+    Day3,
 
     pub fn from_string(s: []const u8) ?AocDay {
         return {
             if (std.mem.eql(u8, s, "day_1")) return AocDay.Day1;
             if (std.mem.eql(u8, s, "day_2")) return AocDay.Day2;
+            if (std.mem.eql(u8, s, "day_3")) return AocDay.Day3;
 
             return null;
         };
@@ -37,5 +40,6 @@ pub fn main() !void {
     switch (day) {
         AocDay.Day1 => try day_1.main(&args_iter),
         AocDay.Day2 => try day_2.main(&args_iter),
+        AocDay.Day3 => try day_3.main(&args_iter),
     }
 }
