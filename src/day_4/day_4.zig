@@ -52,28 +52,28 @@ pub fn main(args: *std.process.ArgIterator) !void {
         height += 1;
     }
 
-    const grid = Grid{
+    var grid = Grid{
         .data = data,
         .width = width,
         .height = height,
     };
-
     std.debug.print("Grid size: {d} x {d}\n", .{ grid.width, grid.height });
     std.debug.print("Total points: {d}\n", .{grid.data.items.len});
 
-    var total_accessible: usize = 0;
-    for (0..grid.data.items.len) |idx| {
-        const point = grid.indexToPoint(idx);
+    var removed_rolls: usize = 0;
+    while (true) {
+        var accessible_points = try getAccessiblePoints(allocator, &grid);
+        defer accessible_points.deinit(allocator);
 
-        // We only care about paper that may be surround so skip non-paper
-        if (!grid.at(point.x, point.y)) continue;
+        if (accessible_points.items.len == 0) break;
 
-        if (!isSurrounded(&grid, point)) {
-            total_accessible += 1;
+        removed_rolls += accessible_points.items.len;
+        for (accessible_points.items) |point| {
+            grid.removeAt(point);
         }
     }
 
-    try aoc_2025.output("{d}\n", .{total_accessible});
+    try aoc_2025.output("{d}\n", .{removed_rolls});
 }
 
 fn parseRow(buffer: []bool, line: []const u8) ![]bool {
@@ -105,12 +105,34 @@ const Grid = struct {
         const y = index / self.width;
         return .{ .x = x, .y = y };
     }
+
+    pub fn removeAt(self: *Grid, point: Point) void {
+        if (0 > point.x or point.x >= self.width or 0 > point.y or point.y >= self.height) {
+            return;
+        }
+        self.data.items[point.y * self.width + point.x] = false;
+    }
 };
 
 const Point = struct {
     x: usize,
     y: usize,
 };
+
+fn getAccessiblePoints(allocator: std.mem.Allocator, grid: *const Grid) !std.ArrayList(Point) {
+    var points = std.ArrayList(Point).empty;
+    for (0..grid.data.items.len) |idx| {
+        const point = grid.indexToPoint(idx);
+
+        // We only care about paper that may be surround so skip non-paper
+        if (!grid.at(point.x, point.y)) continue;
+
+        if (!isSurrounded(grid, point)) {
+            try points.append(allocator, point);
+        }
+    }
+    return points;
+}
 
 fn isSurrounded(grid: *const Grid, point: Point) bool {
     const Direction = struct { i32, i32 };
