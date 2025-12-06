@@ -2,36 +2,13 @@ const std = @import("std");
 
 const aoc_2025 = @import("aoc_2025");
 
-pub fn main(args: *std.process.ArgIterator) !void {
+pub fn main(allocator: std.mem.Allocator, input_data: []const u8) !u64 {
     std.debug.print("Running AOC Day 6\n", .{});
-
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    defer _ = gpa.deinit();
-    const allocator = gpa.allocator();
-
-    const file_path = args.next() orelse {
-        std.debug.print("Missing file path\n", .{});
-        return;
-    };
-
-    var file_content = std.Io.Writer.Allocating.init(allocator);
-    defer file_content.deinit();
-    {
-        const file = try std.fs.cwd().openFile(file_path, .{});
-        defer file.close();
-
-        var buffer: [1024]u8 = undefined;
-        var file_reader = file.reader(&buffer);
-        const reader = &file_reader.interface;
-
-        _ = try reader.streamRemaining(&file_content.writer);
-    }
-    std.debug.print("Data\n{s}\n", .{file_content.written()});
 
     var rows = List([]const u8).init(allocator);
     defer rows.deinit();
     {
-        var lines_iter = std.mem.splitSequence(u8, file_content.written(), "\n");
+        var lines_iter = std.mem.splitSequence(u8, input_data, "\n");
         while (lines_iter.next()) |line| {
             const stripped_line = std.mem.trim(u8, line, " \t\r\n");
             if (stripped_line.len == 0) continue;
@@ -106,7 +83,7 @@ pub fn main(args: *std.process.ArgIterator) !void {
     }
     std.debug.print("Total: {d}\n", .{total});
 
-    try aoc_2025.output("{d}\n", .{total});
+    return total;
 }
 
 const Operator = enum(u8) {

@@ -28,12 +28,39 @@ pub fn main() !void {
         std.debug.print("  Error: {any}\n", .{err});
         return;
     };
+
+    const file_path = args_iter.next() orelse {
+        std.debug.print("Missing file path\n", .{});
+        return;
+    };
+
+    var file_content = std.Io.Writer.Allocating.init(allocator);
+    defer file_content.deinit();
+    {
+        const file = try std.fs.cwd().openFile(file_path, .{});
+        defer file.close();
+
+        var buffer: [1024]u8 = undefined;
+        var file_reader = file.reader(&buffer);
+        const reader = &file_reader.interface;
+
+        _ = try reader.streamRemaining(&file_content.writer);
+    }
+    const input_data = file_content.written();
+
+    std.debug.print("Data\n{s}\n", .{input_data});
+
+    var maybe_result: ?u64 = null;
     switch (day) {
-        AocDay.Day1 => try day_1.main(&args_iter),
-        AocDay.Day2 => try day_2.main(&args_iter),
+        AocDay.Day1 => maybe_result = try day_1.main(input_data),
+        AocDay.Day2 => maybe_result = try day_2.main(input_data),
         AocDay.Day3 => try day_3.main(&args_iter),
         AocDay.Day4 => try day_4.main(&args_iter),
         AocDay.Day5 => try day_5.main(&args_iter),
-        AocDay.Day6 => try day_6.main(&args_iter),
+        AocDay.Day6 => maybe_result = try day_6.main(allocator, input_data),
+    }
+
+    if (maybe_result) |result| {
+        try aoc_2025.output("{d}\n", .{result});
     }
 }

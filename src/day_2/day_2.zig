@@ -2,34 +2,15 @@ const std = @import("std");
 
 const aoc_2025 = @import("aoc_2025");
 
-pub fn main(args: *std.process.ArgIterator) !void {
+pub fn main(input_data: []const u8) !u64 {
     // Prints to stderr, ignoring potential errors.
     std.debug.print("Running AOC Day 2\n", .{});
 
-    const file_path = args.next() orelse {
-        std.debug.print("Missing file path\n", .{});
-        return;
-    };
-
-    std.debug.print("Got file path {s}\n", .{file_path});
-
-    const file = std.fs.cwd().openFile(file_path, .{}) catch |err| {
-        return err;
-    };
-    defer file.close();
-
-    var buffer: [1024]u8 = undefined;
-    var file_reader = file.reader(&buffer);
-    const reader = &file_reader.interface;
-
-    var file_iter = aoc_2025.LinesIterator{
-        .delimiter = ',',
-        .reader = reader,
-    };
+    var lines_iter = std.mem.splitSequence(u8, input_data, ",");
 
     var total: u64 = 0;
 
-    while (try file_iter.next()) |line| {
+    while (lines_iter.next()) |line| {
         const stripped_line = std.mem.trim(u8, line, " \t\r\n");
 
         std.debug.print("Read line: {s}\n", .{stripped_line});
@@ -45,7 +26,7 @@ pub fn main(args: *std.process.ArgIterator) !void {
         }
     }
 
-    try aoc_2025.output("{d}\n", .{total});
+    return total;
 }
 
 const IdRange = struct {

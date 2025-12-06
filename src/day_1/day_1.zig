@@ -3,32 +3,17 @@ const aoc_2025 = @import("aoc_2025");
 
 const DIAL_SIZE = 100;
 
-pub fn main(args: *std.process.ArgIterator) !void {
+pub fn main(input_data: []const u8) !u64 {
     // Prints to stderr, ignoring potential errors.
     std.debug.print("Running AOC Day 1\n", .{});
-
-    const file_path = args.next() orelse {
-        std.debug.print("Missing file path\n", .{});
-        return;
-    };
-
-    std.debug.print("Got file path {s}\n", .{file_path});
-
-    const file = std.fs.cwd().openFile(file_path, .{}) catch |err| {
-        return err;
-    };
-    defer file.close();
-
-    var buffer: [1024]u8 = undefined;
-    var file_reader = file.reader(&buffer);
-    const reader = &file_reader.interface;
-
-    var lines = aoc_2025.LinesIterator{ .delimiter = '\n', .reader = reader };
 
     var zeroes: i64 = 0;
     var current_rotation: i64 = 50;
 
-    while (try lines.next()) |line| {
+    var lines_iter = std.mem.splitSequence(u8, input_data, "\n");
+    while (lines_iter.next()) |line| {
+        if (line.len == 0) continue;
+
         std.debug.print("Current Position: {d}, Rotation: {s}\n", .{ current_rotation, line });
 
         const rotation = try getValueFromLine(line);
@@ -43,8 +28,7 @@ pub fn main(args: *std.process.ArgIterator) !void {
     }
 
     std.debug.print("Total zeroes hit: {d}\n", .{zeroes});
-
-    try aoc_2025.output("{d}\n", .{zeroes});
+    return @intCast(zeroes);
 }
 
 fn getValueFromLine(line: []const u8) !i64 {
