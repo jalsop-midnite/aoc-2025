@@ -7,27 +7,8 @@ const day_4 = @import("day_4/day_4.zig");
 const day_5 = @import("day_5/day_5.zig");
 const day_6 = @import("day_6/day_6.zig");
 
-const AocDay = enum {
-    Day1,
-    Day2,
-    Day3,
-    Day4,
-    Day5,
-    Day6,
-
-    pub fn from_string(s: []const u8) ?AocDay {
-        return {
-            if (std.mem.eql(u8, s, "day_1")) return AocDay.Day1;
-            if (std.mem.eql(u8, s, "day_2")) return AocDay.Day2;
-            if (std.mem.eql(u8, s, "day_3")) return AocDay.Day3;
-            if (std.mem.eql(u8, s, "day_4")) return AocDay.Day4;
-            if (std.mem.eql(u8, s, "day_5")) return AocDay.Day5;
-            if (std.mem.eql(u8, s, "day_6")) return AocDay.Day6;
-
-            return null;
-        };
-    }
-};
+const aoc_2025 = @import("aoc_2025");
+const AocDay = aoc_2025.AocDay;
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -42,8 +23,9 @@ pub fn main() !void {
     _ = exe_path; // ignore for now
 
     const day_arg = args_iter.next() orelse return;
-    const day = AocDay.from_string(day_arg) orelse {
+    const day = AocDay.fromString(day_arg) catch |err| {
         std.debug.print("Unknown day: {s}\n", .{day_arg});
+        std.debug.print("  Error: {any}\n", .{err});
         return;
     };
     switch (day) {
