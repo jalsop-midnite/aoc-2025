@@ -12,6 +12,7 @@ pub fn solve(
     part: aoc_2025.Part,
     input_data: []const u8,
 ) !u64 {
+    std.debug.print("Running AOC Day 7: Part {d}\n", .{@intFromEnum(part)});
     return switch (part) {
         .Part1 => try part1(allocator, input_data),
         .Part2 => try part2(allocator, input_data),
@@ -36,8 +37,6 @@ fn part1(allocator: std.mem.Allocator, input_data: []const u8) !u64 {
         const stripped_line = std.mem.trim(u8, line, " \t\r\n");
         if (stripped_line.len == 0) continue;
 
-        std.debug.print("Read line: {s}\n", .{stripped_line});
-
         var splitters = try getPositions(allocator, line, SPLITTER);
         defer splitters.deinit();
 
@@ -59,8 +58,6 @@ fn part1(allocator: std.mem.Allocator, input_data: []const u8) !u64 {
 }
 
 fn part2(allocator: std.mem.Allocator, input_data: []const u8) !u64 {
-    std.debug.print("Running AOC Day 7\n", .{});
-
     var lines_iter = std.mem.splitSequence(u8, input_data, "\n");
 
     const first_row = lines_iter.next() orelse return error.InvalidInput;
@@ -82,8 +79,6 @@ fn part2(allocator: std.mem.Allocator, input_data: []const u8) !u64 {
     while (lines_iter.next()) |line| {
         const stripped_line = std.mem.trim(u8, line, " \t\r\n");
         if (stripped_line.len == 0) continue;
-
-        std.debug.print("Read line: {s}\n", .{stripped_line});
 
         var splitters = try getPositions(allocator, line, SPLITTER);
         defer splitters.deinit();
