@@ -7,6 +7,7 @@ pub const AocDay = enum(u8) {
     Day4 = 4,
     Day5 = 5,
     Day6 = 6,
+    Day7 = 7,
 
     pub fn fromString(s: []const u8) !AocDay {
         const prefix = "day_";

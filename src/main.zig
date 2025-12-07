@@ -6,6 +6,7 @@ const day_3 = @import("day_3/day_3.zig");
 const day_4 = @import("day_4/day_4.zig");
 const day_5 = @import("day_5/day_5.zig");
 const day_6 = @import("day_6/day_6.zig");
+const day_7 = @import("day_7/day_7.zig");
 
 const aoc_2025 = @import("aoc_2025");
 const AocDay = aoc_2025.AocDay;
@@ -58,6 +59,7 @@ pub fn main() !void {
         AocDay.Day4 => try day_4.main(&args_iter),
         AocDay.Day5 => try day_5.main(&args_iter),
         AocDay.Day6 => maybe_result = try day_6.main(allocator, input_data),
+        AocDay.Day7 => maybe_result = try day_7.part1(allocator, input_data),
     }
 
     if (maybe_result) |result| {
