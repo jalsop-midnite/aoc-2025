@@ -4,28 +4,19 @@ const aoc_2025 = @import("aoc_2025");
 
 const ROLLS_TO_BE_SURROUNDED: usize = 4;
 
-pub fn main(args: *std.process.ArgIterator) !void {
-    std.debug.print("Running AOC Day 4\n", .{});
-
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    defer _ = gpa.deinit();
-    const allocator = gpa.allocator();
-
-    const file_path = args.next() orelse {
-        std.debug.print("Missing file path\n", .{});
-        return;
+pub fn solve(
+    allocator: std.mem.Allocator,
+    part: aoc_2025.Part,
+    input_data: []const u8,
+) !u64 {
+    return switch (part) {
+        .Part1 => return error.NotImplemented,
+        .Part2 => return part2(allocator, input_data),
     };
+}
 
-    const file = try std.fs.cwd().openFile(file_path, .{});
-    defer file.close();
-
-    var buffer: [1024]u8 = undefined;
-    var file_reader = file.reader(&buffer);
-    const reader = &file_reader.interface;
-    var file_iter = aoc_2025.LinesIterator{
-        .delimiter = '\n',
-        .reader = reader,
-    };
+fn part2(allocator: std.mem.Allocator, input_data: []const u8) !u64 {
+    var file_iter = std.mem.splitSequence(u8, input_data, "\n");
 
     var data = std.ArrayList(bool).empty;
     defer data.deinit(allocator);
@@ -33,16 +24,16 @@ pub fn main(args: *std.process.ArgIterator) !void {
     var width: usize = 0;
     var height: usize = 0;
 
-    while (try file_iter.next()) |line| {
+    while (file_iter.next()) |line| {
         const stripped_line = std.mem.trim(u8, line, " \t\r\n");
+        if (stripped_line.len == 0) continue;
+
         if (width == 0) {
             width = stripped_line.len;
         } else if (stripped_line.len != width) {
             // All lines must be the same width
             return error.InvalidInput;
         }
-
-        std.debug.print("Read line: {s}\n", .{stripped_line});
 
         try data.appendNTimes(allocator, false, width);
         const data_buf = data.items[data.items.len - width ..];
@@ -73,7 +64,7 @@ pub fn main(args: *std.process.ArgIterator) !void {
         }
     }
 
-    try aoc_2025.output("{d}\n", .{removed_rolls});
+    return @intCast(removed_rolls);
 }
 
 fn parseRow(buffer: []bool, line: []const u8) ![]bool {

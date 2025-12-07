@@ -58,18 +58,17 @@ pub fn main() !void {
 
     std.debug.print("Data\n{s}\n", .{input_data});
 
-    var maybe_result: ?u64 = null;
-    switch (day) {
-        AocDay.Day1 => maybe_result = try day_1.main(input_data),
-        AocDay.Day2 => maybe_result = try day_2.main(input_data),
-        AocDay.Day3 => try day_3.main(&args_iter),
-        AocDay.Day4 => try day_4.main(&args_iter),
-        AocDay.Day5 => try day_5.main(&args_iter),
-        AocDay.Day6 => maybe_result = try day_6.main(allocator, input_data),
-        AocDay.Day7 => maybe_result = try day_7.solve(allocator, part, input_data),
-    }
+    std.debug.print("Running AOC Day {d}: Part {d}\n", .{ @intFromEnum(day), @intFromEnum(part) });
 
-    if (maybe_result) |result| {
-        try aoc_2025.output("{d}\n", .{result});
-    }
+    const result = switch (day) {
+        AocDay.Day1 => try day_1.solve(part, input_data),
+        AocDay.Day2 => try day_2.solve(part, input_data),
+        AocDay.Day3 => try day_3.solve(allocator, part, input_data),
+        AocDay.Day4 => try day_4.solve(allocator, part, input_data),
+        AocDay.Day5 => try day_5.solve(allocator, part, input_data),
+        AocDay.Day6 => try day_6.solve(allocator, part, input_data),
+        AocDay.Day7 => try day_7.solve(allocator, part, input_data),
+    };
+
+    try aoc_2025.output("{d}\n", .{result});
 }

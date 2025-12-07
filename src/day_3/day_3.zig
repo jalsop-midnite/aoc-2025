@@ -2,40 +2,26 @@ const std = @import("std");
 
 const aoc_2025 = @import("aoc_2025");
 
-pub fn main(args: *std.process.ArgIterator) !void {
-    std.debug.print("Running AOC Day 3\n", .{});
-
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    defer _ = gpa.deinit();
-    const allocator = gpa.allocator();
-
-    const file_path = args.next() orelse {
-        std.debug.print("Missing file path\n", .{});
-        return;
+pub fn solve(
+    allocator: std.mem.Allocator,
+    part: aoc_2025.Part,
+    input_data: []const u8,
+) !u64 {
+    return switch (part) {
+        .Part1 => return error.NotImplemented,
+        .Part2 => return part2(allocator, input_data),
     };
+}
 
-    std.debug.print("Got file path {s}\n", .{file_path});
-
-    const file = std.fs.cwd().openFile(file_path, .{}) catch |err| {
-        return err;
-    };
-    defer file.close();
-
-    var buffer: [1024]u8 = undefined;
-    var file_reader = file.reader(&buffer);
-    const reader = &file_reader.interface;
-
-    var file_iter = aoc_2025.LinesIterator{
-        .delimiter = '\n',
-        .reader = reader,
-    };
+fn part2(allocator: std.mem.Allocator, input_data: []const u8) !u64 {
+    var file_iter = std.mem.splitSequence(u8, input_data, "\n");
 
     var total: u64 = 0;
 
-    while (try file_iter.next()) |line| {
+    while (file_iter.next()) |line| {
         const stripped_line = std.mem.trim(u8, line, " \t\r\n");
 
-        std.debug.print("Read line: {s}\n", .{stripped_line});
+        std.debug.print("Processing line: {s}\n", .{stripped_line});
 
         const joltages = try parseJoltages(allocator, stripped_line);
         defer allocator.free(joltages);
@@ -44,7 +30,7 @@ pub fn main(args: *std.process.ArgIterator) !void {
         total += joltage;
     }
 
-    try aoc_2025.output("{d}\n", .{total});
+    return total;
 }
 
 fn parseJoltages(allocator: std.mem.Allocator, line: []const u8) ![]u64 {
@@ -60,6 +46,10 @@ fn parseJoltages(allocator: std.mem.Allocator, line: []const u8) ![]u64 {
 fn getLargestJoltage(joltages: []const u64, num_digits: u64) u64 {
     var total_joltage: u64 = 0;
     var window_start: u64 = 0;
+
+    if (joltages.len < num_digits) {
+        return 0;
+    }
 
     // e.g. 12 digits from a 15 digit line
     // Know first digit must be from the first 4 as othewise there

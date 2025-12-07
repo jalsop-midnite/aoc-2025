@@ -2,10 +2,14 @@ const std = @import("std");
 
 const aoc_2025 = @import("aoc_2025");
 
-pub fn main(input_data: []const u8) !u64 {
-    // Prints to stderr, ignoring potential errors.
-    std.debug.print("Running AOC Day 2\n", .{});
+pub fn solve(part: aoc_2025.Part, input_data: []const u8) !u64 {
+    return switch (part) {
+        .Part1 => return error.NotImplemented,
+        .Part2 => return part2(input_data),
+    };
+}
 
+fn part2(input_data: []const u8) !u64 {
     var lines_iter = std.mem.splitSequence(u8, input_data, ",");
 
     var total: u64 = 0;

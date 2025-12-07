@@ -3,10 +3,14 @@ const aoc_2025 = @import("aoc_2025");
 
 const DIAL_SIZE = 100;
 
-pub fn main(input_data: []const u8) !u64 {
-    // Prints to stderr, ignoring potential errors.
-    std.debug.print("Running AOC Day 1\n", .{});
+pub fn solve(part: aoc_2025.Part, input_data: []const u8) !u64 {
+    return switch (part) {
+        .Part1 => return error.NotImplemented,
+        .Part2 => return part2(input_data),
+    };
+}
 
+fn part2(input_data: []const u8) !u64 {
     var zeroes: i64 = 0;
     var current_rotation: i64 = 50;
 

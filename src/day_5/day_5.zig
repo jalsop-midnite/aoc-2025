@@ -2,43 +2,29 @@ const std = @import("std");
 
 const aoc_2025 = @import("aoc_2025");
 
-pub fn main(args: *std.process.ArgIterator) !void {
-    std.debug.print("Running AOC Day 5\n", .{});
-
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    defer _ = gpa.deinit();
-    const allocator = gpa.allocator();
-
-    const file_path = args.next() orelse {
-        std.debug.print("Missing file path\n", .{});
-        return;
+pub fn solve(
+    allocator: std.mem.Allocator,
+    part: aoc_2025.Part,
+    input_data: []const u8,
+) !u64 {
+    return switch (part) {
+        .Part1 => return error.NotImplemented,
+        .Part2 => return part2(allocator, input_data),
     };
+}
 
-    var file_content = std.Io.Writer.Allocating.init(allocator);
-    defer file_content.deinit();
-    {
-        const file = try std.fs.cwd().openFile(file_path, .{});
-        defer file.close();
-
-        var buffer: [1024]u8 = undefined;
-        var file_reader = file.reader(&buffer);
-        const reader = &file_reader.interface;
-
-        _ = try reader.streamRemaining(&file_content.writer);
-    }
-    std.debug.print("Data\n{s}\n", .{file_content.written()});
-
-    var parts = std.mem.splitSequence(u8, file_content.written(), "\n\n");
+fn part2(allocator: std.mem.Allocator, input_data: []const u8) !u64 {
+    var parts = std.mem.splitSequence(u8, input_data, "\n\n");
 
     const range_data = parts.next() orelse {
         std.debug.print("Missing ranges part\n", .{});
-        return;
+        return error.MissingRanges;
     };
 
     std.debug.print("Range data\n{s}\n", .{range_data});
     const ids_data = parts.next() orelse {
         std.debug.print("Missing ids part\n", .{});
-        return;
+        return error.MissingIds;
     };
     std.debug.print("Id data\n{s}\n", .{ids_data});
 
@@ -61,7 +47,7 @@ pub fn main(args: *std.process.ArgIterator) !void {
         try ranges.addRange(allocator, range);
     }
 
-    var fresh_ids: usize = 0;
+    var fresh_ids: u64 = 0;
     var end: u64 = 0;
 
     std.debug.print("Counting fresh ids:\n", .{});
@@ -76,10 +62,10 @@ pub fn main(args: *std.process.ArgIterator) !void {
         std.debug.print("Aggregated range {d} - {d}\n", .{ range.start, range.end });
         std.debug.print("  Count: {d}\n", .{range.end - range.start + 1});
 
-        fresh_ids += @as(usize, range.end - range.start + 1);
+        fresh_ids += range.end - range.start + 1;
     }
 
-    try aoc_2025.output("{d}\n", .{fresh_ids});
+    return fresh_ids;
 }
 
 const Range = struct {

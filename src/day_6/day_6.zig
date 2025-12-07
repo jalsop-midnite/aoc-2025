@@ -4,9 +4,18 @@ const aoc_2025 = @import("aoc_2025");
 
 const List = aoc_2025.List;
 
-pub fn main(allocator: std.mem.Allocator, input_data: []const u8) !u64 {
-    std.debug.print("Running AOC Day 6\n", .{});
+pub fn solve(
+    allocator: std.mem.Allocator,
+    part: aoc_2025.Part,
+    input_data: []const u8,
+) !u64 {
+    return switch (part) {
+        .Part1 => return error.NotImplemented,
+        .Part2 => try part2(allocator, input_data),
+    };
+}
 
+fn part2(allocator: std.mem.Allocator, input_data: []const u8) !u64 {
     var rows = List([]const u8).init(allocator);
     defer rows.deinit();
     {
@@ -15,7 +24,6 @@ pub fn main(allocator: std.mem.Allocator, input_data: []const u8) !u64 {
             const stripped_line = std.mem.trim(u8, line, " \t\r\n");
             if (stripped_line.len == 0) continue;
 
-            std.debug.print("Read line: {s}\n", .{stripped_line});
             try rows.append(stripped_line);
         }
     }
