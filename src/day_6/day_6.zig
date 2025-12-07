@@ -2,6 +2,8 @@ const std = @import("std");
 
 const aoc_2025 = @import("aoc_2025");
 
+const List = aoc_2025.List;
+
 pub fn main(allocator: std.mem.Allocator, input_data: []const u8) !u64 {
     std.debug.print("Running AOC Day 6\n", .{});
 
@@ -132,14 +134,4 @@ fn evaluateProblem(problem: Problem) u64 {
     }
 
     return result;
-}
-
-fn List(comptime T: type) type {
-    const list = std.ArrayList(T);
-    return struct {
-        pub fn init(allocator: std.mem.Allocator) std.array_list.AlignedManaged(T, null) {
-            var empty = list.empty;
-            return empty.toManaged(allocator);
-        }
-    };
 }

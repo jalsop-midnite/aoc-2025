@@ -77,3 +77,13 @@ pub fn Solution() type {
         }
     };
 }
+
+pub fn List(comptime T: type) type {
+    const list = std.ArrayList(T);
+    return struct {
+        pub fn init(allocator: std.mem.Allocator) std.array_list.AlignedManaged(T, null) {
+            var empty = list.empty;
+            return empty.toManaged(allocator);
+        }
+    };
+}
