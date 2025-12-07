@@ -30,6 +30,13 @@ pub fn main() !void {
         return;
     };
 
+    const part_arg = args_iter.next() orelse return;
+    const part = aoc_2025.Part.fromString(part_arg) catch |err| {
+        std.debug.print("Unknown part: {s}\n", .{part_arg});
+        std.debug.print("  Error: {any}\n", .{err});
+        return;
+    };
+
     const file_path = args_iter.next() orelse {
         std.debug.print("Missing file path\n", .{});
         return;
@@ -59,7 +66,7 @@ pub fn main() !void {
         AocDay.Day4 => try day_4.main(&args_iter),
         AocDay.Day5 => try day_5.main(&args_iter),
         AocDay.Day6 => maybe_result = try day_6.main(allocator, input_data),
-        AocDay.Day7 => maybe_result = try day_7.part1(allocator, input_data),
+        AocDay.Day7 => maybe_result = try day_7.solve(allocator, part, input_data),
     }
 
     if (maybe_result) |result| {

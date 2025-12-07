@@ -33,6 +33,23 @@ pub const AocDay = enum(u8) {
     }
 };
 
+pub const Part = enum(u8) {
+    Part1 = 1,
+    Part2 = 2,
+
+    pub fn fromString(s: []const u8) !Part {
+        const prefix = "part_";
+        if (s.len < prefix.len) return error.InvalidPrefix;
+        if (!std.mem.eql(u8, s[0..prefix.len], prefix)) return error.InvalidPrefix;
+
+        const int = std.fmt.parseInt(u8, s[prefix.len..], 10) catch return error.InvalidNumber;
+
+        if (int == 0 or int > AocDay.maxDay()) return error.DayOutOfRange;
+
+        return @enumFromInt(int);
+    }
+};
+
 pub const LinesIterator = struct {
     delimiter: u8 = '\n',
     reader: *std.io.Reader,
