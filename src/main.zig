@@ -7,6 +7,7 @@ const day_4 = @import("day_4/day_4.zig");
 const day_5 = @import("day_5/day_5.zig");
 const day_6 = @import("day_6/day_6.zig");
 const day_7 = @import("day_7/day_7.zig");
+const day_8 = @import("day_8/day_8.zig");
 
 const aoc_2025 = @import("aoc_2025");
 const AocDay = aoc_2025.AocDay;
@@ -38,7 +39,7 @@ pub fn main() !void {
     };
 
     const file_path = args_iter.next() orelse {
-        std.debug.print("Missing file path\n", .{});
+        std.debug.print("Using default file path\n", .{});
         return;
     };
 
@@ -68,6 +69,7 @@ pub fn main() !void {
         AocDay.Day5 => try day_5.solve(allocator, part, input_data),
         AocDay.Day6 => try day_6.solve(allocator, part, input_data),
         AocDay.Day7 => try day_7.solve(allocator, part, input_data),
+        AocDay.Day8 => try day_8.solve(allocator, part, input_data),
     };
 
     try aoc_2025.output("{d}\n", .{result});
