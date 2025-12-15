@@ -110,13 +110,85 @@ fn part1(allocator: std.mem.Allocator, input_data: []const u8) !u64 {
 }
 
 fn part2(allocator: std.mem.Allocator, input_data: []const u8) !u64 {
-    std.debug.print("Day 8 Part 2 not implemented\n", .{});
-    _ = allocator;
-    _ = input_data;
-    return error.NotImplemented;
+    const points = try loadPoints(allocator, input_data);
+    defer points.deinit();
+
+    var points_to_circuits = std.AutoArrayHashMap(Point, *Circuit).init(allocator);
+    defer points_to_circuits.deinit();
+
+    var circuits = try allocator.alloc(Circuit, points.items.len);
+    defer {
+        for (circuits) |circuit| {
+            var c = circuit;
+            c.deinit();
+        }
+        allocator.free(circuits);
+    }
+
+    for (points.items, 0..) |point, idx| {
+        var circuit = Circuit.init(allocator);
+        try circuit.put(point, {});
+
+        circuits[idx] = circuit;
+        try points_to_circuits.put(point, &circuits[idx]);
+    }
+
+    const num_pairs = (points.items.len * (points.items.len - 1)) / 2;
+    const pair_distances = try allocator.alloc(PairDistance, num_pairs);
+    defer allocator.free(pair_distances);
+
+    var pairs = iterPairs(points);
+    var index: usize = 0;
+    while (pairs.next()) |pair| {
+        defer index += 1;
+
+        const point_a, const point_b = pair;
+        const dist = distanceSquared(point_a, point_b);
+
+        pair_distances[index] = .{
+            .point_a = point_a,
+            .point_b = point_b,
+            .distance = dist,
+        };
+    }
+
+    // Sort distances
+    const sorted_distances = pair_distances[0..index];
+    std.sort.heap(
+        PairDistance,
+        sorted_distances,
+        {},
+        bySmallestDistance,
+    );
+
+    for (sorted_distances[0..6386]) |pair_distance| {
+        const point_a = pair_distance.point_a;
+        const point_b = pair_distance.point_b;
+
+        std.debug.print("joining points {any} {any}\n", .{ point_a, point_b });
+
+        const circuit_a = points_to_circuits.get(point_a).?;
+        const circuit_b = points_to_circuits.get(point_b).?;
+
+        if (circuit_a != circuit_b) {
+            var b_points = circuit_b.keyIterator();
+            while (b_points.next()) |point| {
+                try circuit_a.put(point.*, {});
+                try points_to_circuits.put(point.*, circuit_a);
+            }
+
+            circuit_b.clearAndFree();
+        }
+
+        if (length(circuit_a.*) == points.items.len) {
+            return point_a[0] * point_b[0];
+        }
+    }
+
+    return error.CouldNotFindPoints;
 }
 
-const Point = @Vector(3, u32);
+const Point = @Vector(3, u64);
 
 const PairDistance = struct {
     point_a: Point,
@@ -151,9 +223,9 @@ fn parsePoint(line: []const u8) !Point {
     const y_str = parts.next() orelse return error.InvalidInput;
     const z_str = parts.next() orelse return error.InvalidInput;
 
-    const x = std.fmt.parseInt(u32, x_str, 10) catch return error.InvalidNumber;
-    const y = std.fmt.parseInt(u32, y_str, 10) catch return error.InvalidNumber;
-    const z = std.fmt.parseInt(u32, z_str, 10) catch return error.InvalidNumber;
+    const x = std.fmt.parseInt(u64, x_str, 10) catch return error.InvalidNumber;
+    const y = std.fmt.parseInt(u64, y_str, 10) catch return error.InvalidNumber;
+    const z = std.fmt.parseInt(u64, z_str, 10) catch return error.InvalidNumber;
 
     return Point{ x, y, z };
 }
